@@ -1,8 +1,8 @@
 ---
-nifi_version: 1.14.0
+nifi_version: 1.20.0
 
 # See https://www.apache.org/dyn/closer.lua to find mirrors
-download_mirror_uri: https://apache.claz.org
+download_mirror_uri: https://archive.apache.org/dist
 
 nifi_user: nifi
 nifi_group: nifi
@@ -51,7 +51,7 @@ state_management:
   /stateManagement/local-provider/property[@name="Directory"]: "{{ nifi_config_dirs.external_config }}/state/local"
 
 # Specify how many userGroupProviders are used authorizers.xml.
-authorizers_user_group_providers: 0
+authorizers_user_group_providers: 3
 
 # Specify any property from authorizers.xml here.
 # Use XPath expressions as keys.
