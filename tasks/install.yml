@@ -11,6 +11,7 @@
   uri:
     url: https://archive.apache.org/dist/nifi/{{ nifi_version }}/nifi-{{ nifi_version }}-bin.zip.sha256
     return_content: true
+    validate_certs: false
   register: sha256_sum
   when: not tar_file.stat.exists
 
@@ -19,6 +20,7 @@
     url: "{{ download_mirror_uri }}/nifi/{{ nifi_version }}/nifi-{{ nifi_version }}-bin.zip"
     dest: "{{ nifi_config_dirs.binaries }}/nifi-{{ nifi_version }}-bin.zip"
     checksum: "sha256:{{ sha256_sum.content }}"
+    validate_certs: false
   when: not tar_file.stat.exists
 
 - name: Unpack NiFi binary
