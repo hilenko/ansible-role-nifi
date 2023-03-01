@@ -35,10 +35,10 @@
 - name: Update logback.xml
   xml:
     path: "{{ nifi_config_dirs.home }}/conf/logback.xml"
-    xpath: "{{ item.key }}"
+    xpath: "{{ item.xpath }}"
     value: "{{ item.value }}"
     pretty_print: yes
-  with_dict: "{{ logback }}"
+  with_items: "{{ logback}}"
   notify: restart_nifi
 
 - name: Update login-identity-providers.xml
