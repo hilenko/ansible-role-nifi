@@ -10,9 +10,9 @@
 - name: Update bootstrap.conf
   lineinfile:
     path: "{{ nifi_config_dirs.home }}/conf/bootstrap.conf"
-    line: "{{ item.key }}={{ item.value }}"
-    regexp: "^{{ item.key }}="
-  with_dict: "{{ bootstrap }}"
+    line: "{{ item }}"
+    regexp: "^{{ item.split('=')[0] }}="
+  with_items: "{{ bootstrap }}"
   notify: restart_nifi
 
 - name: Update nifi-env.sh
