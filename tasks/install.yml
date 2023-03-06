@@ -9,7 +9,7 @@
 
 - name: Get NiFi binary checksum
   uri:
-    url: {{ download_mirror_uri }}/nifi/{{ nifi_version }}/nifi-{{ nifi_version }}-bin.zip.sha256
+    url: "{{ download_mirror_uri }}/nifi/{{ nifi_version }}/nifi-{{ nifi_version }}-bin.zip.sha256"
     return_content: true
     validate_certs: false
   register: sha256_sum
