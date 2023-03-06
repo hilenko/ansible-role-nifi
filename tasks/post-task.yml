@@ -1,13 +1,15 @@
-post_tasks:
-  - name: Encrypt configuration
-    become: yes
-    become_method: sudo
-    vars:
-      script: "{{ script | default('encrypt-config.sh') }}"
-      script_path: "{{ script_path | default('/opt/nifi-toolkit/bin') }}"
-      bootstrap_conf: "{{ bootstrap_conf | default('bootstrap.conf') }}"
-      key_id: "{{ key_id | default('my_super_key_id') }}"
-      properties: "{{ properties | default('nifi.properties') }}"
-    tasks:
-      - name: Run encrypt-config.sh script
-        command: "{{ script_path }}/{{ script }} -b {{ bootstrap_conf }} -k {{ key_id }} -n {{ properties }}"
+#post_tasks:
+#  - name: Encrypt configuration
+#    become: yes
+#    become_method: sudo
+#    vars:
+#      script: "{{ script | default('encrypt-config.sh') }}"
+#      script_path: "{{ script_path }}"
+#      bootstrap_conf: "{{ bootstrap_conf}}"
+#      commands:
+#        - script_args: "-n {{ properties1 | default('nifi.properties') }}"
+#        - script_args: "-n {{ properties2 | default('nifi.properties') }}"
+#    tasks:
+#      - name: Run encrypt-config.sh script
+#        shell: "{{ script_path }}/{{ script }} -b {{ bootstrap_conf }} {{ item.script_args }}"
+#        loop: "{{ commands }}"

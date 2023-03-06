@@ -50,12 +50,22 @@
     follow: no
     force: yes
 
+- name: Get NiFi Toolkit binary checksum
+  uri:
+    url: "{{ download_mirror_uri_toolkit }}/nifi/{{ nifi_version }}/nifi-toolkit-{{ nifi_version }}-bin.zip.sha256"
+    return_content: true
+    validate_certs: false
+  register: sha256_sum_toolkit
+  when: not tar_file.stat.exists
+
 - name: Download NiFi Toolkit binary
   get_url:
     url: "{{ download_mirror_uri_toolkit }}/nifi/{{ nifi_version }}/nifi-toolkit-{{ nifi_version }}-bin.zip"
     dest: "{{ nifi_config_dirs.binaries }}/nifi-toolkit-{{ nifi_version }}-bin.zip"
+    checksum: "sha256:{{ sha256_sum_toolkit.content }}"
     validate_certs: false
     timeout: 60
+    when: not tar_file.stat.exists
 
 - name: Unpack NiFi Toolkit binary
   unarchive:

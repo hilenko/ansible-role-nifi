@@ -8,11 +8,14 @@ download_mirror_uri_toolkit: https://dlcdn.apache.org
 #aws encryp config
 aws_region: "eu-central-1"
 
+script_path: {{ nifi_config_dirs.toolkit }}/nifi-toolkit-{{ nifi_version }}/bin
+bootstrap_conf: {{ nifi_config_dirs.home }}/conf/bootstrap.conf
+
 nifi_user: nifi
 nifi_group: nifi
 
 nifi_config_dirs:
-  toolkit: /opt/nifi-toolkit
+  toolkit: /opt/
   binaries: /tmp
   install: /opt/nifi/releases
   home: /opt/nifi/releases/current
