@@ -55,8 +55,6 @@ nifi_properties:
 
 # Specify any property from bootstrap.conf here.
 bootstrap:
-  java.arg.2: '-Xms512m'
-  java.arg.3: '-Xmx512m'
   nifi.bootstrap.listen.port: '0'
   java.arg.18: '-Duser.timezone=Europe/Kiev'
   java.arg.30: '-Dcom.ibm.mq.cfg.useIBMCipherMappings=false'
