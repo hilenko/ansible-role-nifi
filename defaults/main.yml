@@ -58,8 +58,6 @@ nifi_properties:
 # Specify any property from bootstrap.conf here.
 bootstrap:
   nifi.bootstrap.listen.port: '0'
-  java.arg.18: '-Duser.timezone=Europe/Kiev'
-  java.arg.30: '-Dcom.ibm.mq.cfg.useIBMCipherMappings=false'
 
 # Specify any property from nifi-env.sh here.
 nifi_env:
@@ -92,7 +90,6 @@ state_management:
   /stateManagement/local-provider/class: org.apache.nifi.controller.state.providers.local.WriteAheadLocalStateProvider
   /stateManagement/local-provider/property[@name="Partitions"]: 16
   /stateManagement/local-provider/property[@name="Checkpoint Interval"]: 2 mins
-  /stateManagement/local-provider/property[@name="Always Sync"]: false
   /stateManagement/cluster-provider/property[@name="Connect String"]:
   /stateManagement/cluster-provider/property[@name="Root Node"]: /nifi
   /stateManagement/cluster-provider/property[@name="Session Timeout"]: 10 seconds
