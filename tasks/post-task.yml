@@ -4,7 +4,7 @@ post_tasks:
     become_method: sudo
     vars:
       script: "{{ script | default('encrypt-config.sh') }}"
-      script_path: "{{ script_path | default('/opt/toolkit/script') }}"
+      script_path: "{{ script_path | default('/opt/nifi-toolkit/bin') }}"
       bootstrap_conf: "{{ bootstrap_conf | default('bootstrap.conf') }}"
       key_id: "{{ key_id | default('my_super_key_id') }}"
       properties: "{{ properties | default('nifi.properties') }}"
