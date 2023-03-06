@@ -4,6 +4,9 @@ nifi_version: 1.20.0
 # See https://www.apache.org/dyn/closer.lua to find mirrors
 download_mirror_uri: https://archive.apache.org/dist
 
+#aws encryp config
+aws_region: "eu-central-1"
+
 nifi_user: nifi
 nifi_group: nifi
 
@@ -22,12 +25,41 @@ nifi_properties:
   nifi.flowfile.repository.directory: "{{ nifi_config_dirs.external_config }}/flowfile_repository"
   nifi.content.repository.directory.default: "{{ nifi_config_dirs.external_config }}/content_repository"
   nifi.provenance.repository.directory.default: "{{ nifi_config_dirs.external_config }}/provenance_repository"
-  nifi.security.user.login.identity.provider: single-user-provider
+  nifi.state.management.provider.local: local-provider
+  nifi.state.management.provider.cluster: zk-provider
+  nifi.state.management.embedded.zookeeper.start: false
+  nifi.flowfile.repository.checkpoint.interval: 2 mins
+  nifi.flowfile.repository.retain.orphaned.flowfiles: true
+  nifi.content.claim.max.appendable.size: 1 MB
+  nifi.provenance.repository.max.storage.time: 24 hours
+  nifi.provenance.repository.max.storage.size: 4 GB
+  nifi.provenance.repository.rollover.time: 30 secs
+  nifi.provenance.repository.rollover.size: 500 MB
+  nifi.provenance.repository.query.threads: 4
+  nifi.provenance.repository.index.threads: 4
+  nifi.provenance.repository.indexed.fields: EventType, FlowFileUUID, Filename, ProcessorID, Relationship
+  nifi.provenance.repository.index.shard.size: 2 GB
+  nifi.provenance.repository.concurrent.merge.threads: 8
+  nifi.remote.input.socket.port: 10443
+  nifi.sensitive.props.algorithm: PBEWITHMD5AND256BITAES-CBC-OPENSSL
+  nifi.security.keystoreType: JKS
+  nifi.security.truststoreType: JKS
+  nifi.security.user.authorizer: managed-authorizer
+  nifi.security.user.login.identity.provider: ldap-provider
+  nifi.security.user.saml.metadata.signing.enabled: false
+  nifi.security.user.saml.signature.digest.algorithm: http://www.w3.org/2001/04/xmlenc#sha256
+  nifi.security.user.saml.message.logging.enabled: false
+  nifi.security.user.saml.http.client.truststore.strategy: JDK
+  nifi.listener.bootstrap.port: 0
+  nifi.kerberos.spnego.authentication.expiration: 12 hours
 
 # Specify any property from bootstrap.conf here.
 bootstrap:
   java.arg.2: '-Xms512m'
   java.arg.3: '-Xmx512m'
+  nifi.bootstrap.listen.port: '0'
+  java.arg.18: '-Duser.timezone=Europe/Kiev'
+  java.arg.30: '-Dcom.ibm.mq.cfg.useIBMCipherMappings=false'
 
 # Specify any property from nifi-env.sh here.
 nifi_env:
@@ -42,13 +74,29 @@ logback:
 # Specify any property from login-identity-providers.xml here.
 # Use XPath expressions as keys.
 login_identity_providers:
-  /loginIdentityProviders/provider/identifier: single-user-provider
-  /loginIdentityProviders/provider/class: org.apache.nifi.authentication.single.user.SingleUserLoginIdentityProvider
+  /loginIdentityProviders/provider/identifier: ldap-provider
+  /loginIdentityProviders/provider/property[@name="Identity Strategy"]: USE_USERNAME
+  /loginIdentityProviders/provider/property[@name="Authentication Expiration"]: 12 hours
+  /loginIdentityProviders/provider/property[@name="Referral Strategy"]: FOLLOW
+  /loginIdentityProviders/provider/property[@name="Connect Timeout"]: 10 secs
+  /loginIdentityProviders/provider/property[@name="Read Timeout"]: 10 secs
+  /loginIdentityProviders/provider/property[@name="TLS - Truststore Type"]: JKS
+  /loginIdentityProviders/provider/property[@name="TLS - Client Auth"]:
+  /loginIdentityProviders/provider/property[@name="TLS - Protocol"]: TLS
+  /loginIdentityProviders/provider/property[@name="TLS - Shutdown Gracefully"]:
 
 # Specify any property from state-management.xml here.
 # Use XPath expressions as keys.
 state_management:
-  /stateManagement/local-provider/property[@name="Directory"]: "{{ nifi_config_dirs.external_config }}/state/local"
+  /stateManagement/local-provider/id: local-provider
+  /stateManagement/local-provider/class: org.apache.nifi.controller.state.providers.local.WriteAheadLocalStateProvider
+  /stateManagement/local-provider/property[@name="Partitions"]: 16
+  /stateManagement/local-provider/property[@name="Checkpoint Interval"]: 2 mins
+  /stateManagement/local-provider/property[@name="Always Sync"]: false
+  /stateManagement/cluster-provider/property[@name="Connect String"]:
+  /stateManagement/cluster-provider/property[@name="Root Node"]: /nifi
+  /stateManagement/cluster-provider/property[@name="Session Timeout"]: 10 seconds
+  /stateManagement/cluster-provider/property[@name="Access Control"]: Open
 
 # Specify how many userGroupProviders are used authorizers.xml.
 authorizers_user_group_providers: 3
@@ -56,8 +104,15 @@ authorizers_user_group_providers: 3
 # Specify any property from authorizers.xml here.
 # Use XPath expressions as keys.
 authorizers:
-  /authorizers/authorizer/identifier: single-user-authorizer
-  /authorizers/authorizer/class: org.apache.nifi.authorization.single.user.SingleUserAuthorizer
+  /authorizers/accessPolicyProvider/property[@name="Authorizations File"]: "{{ nifi_config_dirs.external_config }}/authorizations.xml"
+  /authorizers/accessPolicyProvider/property[@name="Node Group"]:
+  /authorizers/authorizer/identifier: managed-authorizer
+  /authorizers/authorizer/class: org.apache.nifi.authorization.StandardManagedAuthorizer
+  /authorizers/authorizer/property[@name="Access Policy Provider"]: file-access-policy-provider
+  /authorizers/accessPolicyProvider/property[@name="Legacy Authorized Users File"]:
+  /authorizers/accessPolicyProvider/identifier: file-access-policy-provider
+  /authorizers/accessPolicyProvider/class: org.apache.nifi.authorization.FileAccessPolicyProvider
+  /authorizers/accessPolicyProvider/property[@name="User Group Provider"]: composite-user-group-provider
 
 # The following zookeeper properties are only used if
 # nifi_properties.nifi.state.management.embedded.zookeeper.start == true

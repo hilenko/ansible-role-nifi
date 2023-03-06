@@ -10,9 +10,9 @@
 - name: Update bootstrap.conf
   lineinfile:
     path: "{{ nifi_config_dirs.home }}/conf/bootstrap.conf"
-    line: "{{ item }}"
-    regexp: "^{{ item.split('=')[0] }}="
-  with_items: "{{ bootstrap }}"
+    line: "{{ item.key }}={{ item.value }}"
+    regexp: "^{{ item.key }}="
+  with_dict: "{{ bootstrap }}"
   notify: restart_nifi
 
 - name: Update nifi-env.sh
@@ -35,10 +35,10 @@
 - name: Update logback.xml
   xml:
     path: "{{ nifi_config_dirs.home }}/conf/logback.xml"
-    xpath: "{{ item.xpath }}"
+    xpath: "{{ item.key }}"
     value: "{{ item.value }}"
     pretty_print: yes
-  with_items: "{{ logback}}"
+  with_dict: "{{ logback }}"
   notify: restart_nifi
 
 - name: Update login-identity-providers.xml
@@ -79,3 +79,12 @@
     - nifi_properties['nifi.state.management.embedded.zookeeper.start'] is defined
     - nifi_properties['nifi.state.management.embedded.zookeeper.start'] | bool
   notify: restart_nifi
+
+- name: update bootstrap-aws.conf
+  lineinfile:
+    path: "{{ nifi_config_dirs.home }}/conf/bootstrap-aws.conf"
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "aws.kms.key.id", value: "{{ aws_kms_key_id }}" }
+    - { key: "aws.region", value: "{{ aws_region }}" }
