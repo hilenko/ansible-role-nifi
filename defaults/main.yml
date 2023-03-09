@@ -11,6 +11,11 @@ aws_region: "eu-central-1"
 script_path: "{{ nifi_config_dirs.toolkit }}/nifi-toolkit-{{ nifi_version }}/bin"
 bootstrap_conf: "{{ nifi_config_dirs.home }}/conf/bootstrap.conf"
 
+#keystore config
+store_path: "{{ nifi_config_dirs.home }}/conf"
+keystore_name: "keystore"
+trustore_name: "trustore"
+
 nifi_user: nifi
 nifi_group: nifi
 
