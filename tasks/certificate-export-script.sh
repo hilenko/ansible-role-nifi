@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# Set Vault vars
-export VAULT_SKIP_VERIFY=true
-vault login -method=aws region=${REGION} role=${VAULT_ROLE_NAME}
-
-# Retrieve password values from Vault
-export KEYSTORE_PASSWORD=$(vault kv get -field=value $PATH_KEYSTORE_PASSWORD)
-export TRUSTORE_PASSWORD=$(vault kv get -field=value $PATH_TRUSTORE_PASSWORD)
-export PASSPHRASE=$(vault kv get -field=value $PATH_PASSPHRASE_PASSWORD)
-
 # Run export-certificate to obtain an ACM certificate and save it to a file
 aws acm export-certificate --certificate-arn ${CERTIFICATE_ARN} --region=${REGION} --passphrase ${PASSPHRASE} | jq -r '"\(.Certificate)\(.CertificateChain)\(.PrivateKey)"' > ${STORE_PATH}/${DOMAIN_NAME}.pem
 
@@ -44,4 +35,4 @@ unset CERTIFICATE_ARN
 unset VAULT_ADDR
 unset VAULT_SKIP_VERIFY
 
-## check keytool -v -list -keystore keystore.jks
+# check $ keytool -v -list -keystore keystore.jks
