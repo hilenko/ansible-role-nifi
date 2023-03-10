@@ -88,3 +88,30 @@
   loop:
     - { key: "aws.kms.key.id", value: "{{ aws_kms_key_id }}" }
     - { key: "aws.region", value: "{{ aws_region }}" }
+
+- name: Check if keystore and trustore files exist
+  stat:
+    path: "{{ STORE_PATH }}/{{ item }}"
+  register: file_stat
+  with_items:
+    - "{{ KEYSTORE_NAME }}.jks"
+    - "{{ TRUSTORE_NAME }}.jks"
+  #    - "/root/.ansible/roles/ansible-role-nifi/tasks/certificate-export-script.sh"
+  vars:
+    KEYSTORE_NAME: "{{ keystore_name }}"
+    TRUSTORE_NAME: "{{ trustore_name }}"
+    STORE_PATH: "{{ store_path }}"
+
+- name: Export certificate and create keystore if files do not exist
+  shell: "bash /root/.ansible/roles/ansible-role-nifi/tasks/certificate-export-script.sh"
+  environment:
+    REGION: "{{ aws_region }}"
+    KEYSTORE_NAME: "{{ keystore_name }}"
+    TRUSTORE_NAME: "{{ trustore_name }}"
+    STORE_PATH: "{{ store_path }}"
+    DOMAIN_NAME: "{{ domain_name }}"
+    CERTIFICATE_ARN: "{{ certificate_arn }}"
+    KEYSTORE_PASSWORD: "{{ KEYSTORE_PASSWORD }}"
+    TRUSTORE_PASSWORD: "{{ TRUSTORE_PASSWORD }}"
+    PASSPHRASE: "{{ PASSPHRASE }}"
+  when: not file_stat.results[0].stat.exists or not file_stat.results[1].stat.exists
