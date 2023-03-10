@@ -10,7 +10,7 @@ export TRUSTORE_PASSWORD=$(vault kv get -field=value $PATH_TRUSTORE_PASSWORD)
 export PASSPHRASE=$(vault kv get -field=value $PATH_PASSPHRASE_PASSWORD)
 
 # Run export-certificate to obtain an ACM certificate and save it to a file
-aws acm export-certificate --certificate-arn --region=${REGION} ${CERTIFICATE_ARN} --passphrase ${PASSPHRASE} | jq -r '"\(.Certificate)\(.CertificateChain)\(.PrivateKey)"' > ${STORE_PATH}/${DOMAIN_NAME}.pem
+aws acm export-certificate --certificate-arn ${CERTIFICATE_ARN} --region=${REGION} --passphrase ${PASSPHRASE} | jq -r '"\(.Certificate)\(.CertificateChain)\(.PrivateKey)"' > ${STORE_PATH}/${DOMAIN_NAME}.pem
 
 # To split a certificate and a private key into two separate files
 openssl rsa -in ${STORE_PATH}/${DOMAIN_NAME}.pem -out ${STORE_PATH}/${DOMAIN_NAME}.key -passin pass:${PASSPHRASE}
